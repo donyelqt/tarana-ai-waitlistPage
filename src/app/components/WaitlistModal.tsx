@@ -147,7 +147,7 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
             </div>
             <button
               type="submit"
-              className="w-full bg-gradient-to-b from-blue-700 to-blue-500 text-white py-3 rounded-2xl font-semibold hover:to-blue-700 transition-colors text-base"
+              className="w-full bg-gradient-to-b from-blue-700 to-blue-500 text-white py-3 rounded-2xl font-medium hover:to-blue-700 transition-colors text-base"
             >
               Join the Waitlist
             </button>
