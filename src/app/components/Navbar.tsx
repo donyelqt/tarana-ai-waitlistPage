@@ -19,7 +19,7 @@ const Navbar = () => {
         </div>
 
         {/* CTA Button */}
-        <Link href="/waitlist" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+        <Link href="/waitlist" className="bg-gradient-to-b from-blue-700 to-blue-500 text-white px-6 py-2 rounded-2xl font-medium hover:to-blue-700 transition-colors">
           Join the Waitlist
         </Link>
       </nav>

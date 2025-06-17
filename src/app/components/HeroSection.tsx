@@ -24,7 +24,7 @@ const HeroSection = () => {
                 {/* CTA Button */}
                 <Link
                     href="/waitlist"
-                    className="bg-gradient-to-b from-blue-700 to-blue-500 text-white px-8 py-3 rounded-xl text-lg font-medium hover:to-blue-700 transition-colors flex items-center shadow-md"
+                    className="bg-gradient-to-b from-blue-700 to-blue-500 text-white px-9 py-3 rounded-2xl text-lg font-medium hover:to-blue-700 transition-colors flex items-center shadow-md"
                 >
                     Join the Waitlist
                     <ArrowRight className="ml-2 h-5 w-5" />

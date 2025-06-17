@@ -36,7 +36,7 @@ const HowItWorksSection = () => {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-xl font-bold mt-10 mb-3">Set Your Trip Details</h3>
+              <h3 className="text-xl font-semibold mt-10 mb-3">Set Your Trip Details</h3>
               <p className="text-blue-100">
                 Input your budget, number of people, stay duration, and what you love.
               </p>
@@ -53,7 +53,7 @@ const HowItWorksSection = () => {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-xl font-bold mt-10 mb-3">Let AI Handle the Planning</h3>
+              <h3 className="text-xl font-semibold mt-10 mb-3">Let AI Handle the Planning</h3>
               <p className="text-blue-100">
                 We instantly create a day-by-day itinerary optimized for your style and the citys real-time conditions.
               </p>
@@ -70,7 +70,7 @@ const HowItWorksSection = () => {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-xl font-bold mt-10 mb-3">Explore Baguio Effortlessly</h3>
+              <h3 className="text-xl font-semibold mt-10 mb-3">Explore Baguio Effortlessly</h3>
               <p className="text-blue-100">
                 Get a beautiful, ready-to-go plan — from places to eat to shortcuts around traffic. All on one screen.
               </p>
