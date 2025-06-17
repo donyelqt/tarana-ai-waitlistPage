@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 type AboutSectionProps = {
   onJoinWaitlistClick: () => void;
@@ -32,7 +33,13 @@ const AboutSection = ({ onJoinWaitlistClick }: AboutSectionProps) => {
             </div>
           </div>
           <div className="md:w-1/2 mt-12 md:mt-0">
-            <div className="bg-gray-200 w-full h-96 rounded-3xl"></div>
+            <Image
+              src="/images/mainlogo.png"
+              alt="Tarana AI Main Logo"
+              width={800}
+              height={800}
+              className="rounded-3xl object-contain w-full h-96"
+            />
           </div>
         </div>
       </div>

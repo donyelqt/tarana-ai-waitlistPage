@@ -49,10 +49,10 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
           <div className="flex items-center space-x-2 mb-6">
             <Image src="/images/taranaai.png" alt="Tarana-ai logo" width={120} height={120} />
           </div>
-          <h2 className="text-lg md:text-xl font-bold text-blue-600 mb-2">
+          <h2 className="text-lg md:text-xl font-medium text-blue-600 mb-2">
             Join our Waitlist
           </h2>
-          <h1 className="text-2xl md:text-4xl font-extrabold mb-4 leading-tight">
+          <h1 className="text-2xl md:text-4xl font-medium mb-4 leading-tight">
             Get a Personalized Baguio Trip Plan in Seconds!
           </h1>
           <p className="text-gray-600 mb-8 text-sm md:text-base">
@@ -95,35 +95,35 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
         <div className="w-full bg-gray-100 md:my-12 md:mr-8 rounded-b-4xl md:rounded-4xl md:w-1/2 p-6 sm:p-8 md:p-12">
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-black mb-2">
                 Name
               </label>
               <input
                 type="text"
                 id="name"
                 placeholder="Enter your Name"
-                className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full px-4 py-3 border border-white rounded-2xl focus:ring-blue-500 focus:border-blue-600 text-sm"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
                 Email Address
               </label>
               <input
                 type="email"
                 id="email"
                 placeholder="Enter your Email Address"
-                className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full px-4 py-3 border border-white rounded-2xl focus:ring-blue-500 focus:border-blue-500 text-sm hover:border-blue-600 transition-colors"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Are you a:</label>
+                <label className="block text-sm font-medium text-black mb-3">Are you a:</label>
                 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-start space-y-2 sm:space-y-0 sm:space-x-4">
                     <label className="flex items-center cursor-pointer p-2 rounded-lg">
                         <input id="tourist" name="userType" type="radio" className="focus:ring-blue-500 h-4 w-4 border-gray-300 accent-blue-600" value="Tourist/Visitor" checked={userType === 'Tourist/Visitor'} onChange={e => setUserType(e.target.value)} />
