@@ -16,22 +16,32 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch("/api/waitlist", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, userType }),
-    });
-
-    if (response.ok) {
-      toast({
-        title: "Successfully joined!",
-        description: "Thank you for joining the waitlist!",
+    try {
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, userType }),
       });
-      onClose();
-    } else {
-      alert("Something went wrong. Please try again.");
+
+      if (response.ok) {
+        toast({
+          title: "Successfully joined!",
+          description: "Thank you for joining the waitlist!",
+        });
+        onClose();
+      } else {
+        const errorData = await response.json();
+        const message =
+          errorData.message || "Something went wrong. Please try again.";
+        alert(message);
+      }
+    } catch (error) {
+      console.error("An error occurred during fetch:", error);
+      alert(
+        "An unexpected error occurred. Please check the console and try again."
+      );
     }
   };
 
