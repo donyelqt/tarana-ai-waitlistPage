@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
 import { put, list, del } from "@vercel/blob";
 
+interface WaitlistUser {
+  name: string;
+  email: string;
+  userType: string;
+  joinedAt: string;
+}
+
 const LOCK_FILE = "waitlist.lock";
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 300; // 300ms
@@ -14,8 +21,8 @@ async function acquireLock() {
         contentType: "text/plain",
       });
       return true;
-    } catch (error: any) {
-      if (error.status === 409) {
+    } catch (error) {
+      if ((error as { status?: number })?.status === 409) {
         // Conflict, lock exists
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
       } else {
@@ -56,7 +63,7 @@ export async function POST(request: Request) {
       );
     }
 
-    let waitlist: any[] = [];
+    let waitlist: WaitlistUser[] = [];
     try {
       const blobList = await list({ prefix: "waitlist.json", limit: 1 });
       if (blobList.blobs.length > 0) {
