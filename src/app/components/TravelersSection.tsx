@@ -62,7 +62,7 @@ const TravelersSection = () => {
 
               {/* Title and description */}
               <div className="p-6 text-center h-44">
-                <h3 className="text-2xl font-semibold mb-3">{traveler.title}</h3>
+                <h3 className="text-2xl font-medium mb-3">{traveler.title}</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">{traveler.description}</p>
               </div>
             </div>

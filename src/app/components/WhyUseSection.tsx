@@ -21,7 +21,7 @@ const WhyUseSection = () => {
                                 quality={100}
                             />
                         </div>
-                        <h3 className="text-xl font-semibold mb-3">Personalized Itinerary</h3>
+                        <h3 className="text-xl font-medium mb-3">Personalized Itinerary</h3>
                         <p className="text-gray-600">
                             No more guesswork. Just tell us what you love — food, culture, nature, chill vibes — and we will do the rest.
                         </p>
@@ -38,7 +38,7 @@ const WhyUseSection = () => {
                                 quality={100}
                             />
                         </div>
-                        <h3 className="text-xl font-semibold mb-3">Traffic-Smart Routes</h3>
+                        <h3 className="text-xl font-medium mb-3">Traffic-Smart Routes</h3>
                         <p className="text-gray-600">
                             We use live traffic data to keep your day flowing smoothly. Less waiting. More exploring.
                         </p>
@@ -55,7 +55,7 @@ const WhyUseSection = () => {
                                 quality={100}
                             />
                         </div>
-                        <h3 className="text-xl font-semibold mb-3">Local Hidden Gems</h3>
+                        <h3 className="text-xl font-medium mb-3">Local Hidden Gems</h3>
                         <p className="text-gray-600">
                             Go beyond the usual. Discover authentic Baguio spots curated with help from locals, bloggers, and community partners.
                         </p>
