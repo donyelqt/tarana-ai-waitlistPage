@@ -18,13 +18,11 @@ const Navbar = ({ onJoinWaitlistClick }: NavbarProps) => {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <Image
-            src="/file.svg"
+            src="/images/taranaai.png"
             alt="Tarana-ai logo"
-            width={32}
-            height={32}
-            className="h-7 w-7 sm:h-8 sm:w-8"
+            width={125}
+            height={125}
           />
-          <span className="text-lg sm:text-xl font-bold">Tarana-ai</span>
         </Link>
 
         {/* Desktop Links */}
@@ -46,29 +44,54 @@ const Navbar = ({ onJoinWaitlistClick }: NavbarProps) => {
 
         {/* Mobile Menu Button */}
         <div className="md:hidden">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="transition-transform duration-300 ease-in-out"
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </nav>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden mt-4 bg-white rounded-lg shadow-lg p-4">
-          <Link href="/" className="block py-2 text-gray-600 hover:text-blue-600">Home</Link>
-          <Link href="/about" className="block py-2 text-gray-600 hover:text-blue-600">About</Link>
-          <Link href="/contact" className="block py-2 text-gray-600 hover:text-blue-600">Contact</Link>
-           <button
-            onClick={() => {
-                onJoinWaitlistClick();
-                setIsMenuOpen(false);
-            }}
-            className="w-full mt-2 bg-gradient-to-b from-blue-700 to-blue-500 text-white px-5 py-2 rounded-2xl font-medium hover:to-blue-700 transition-colors text-sm sm:text-base"
-            >
-            Join the Waitlist
-            </button>
-        </div>
-      )}
+      <div
+        className={`md:hidden absolute top-full left-0 w-full bg-white rounded-lg shadow-lg p-4 mt-2 transition-all duration-300 ease-in-out transform ${
+          isMenuOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-4 pointer-events-none"
+        }`}
+      >
+        <Link
+          href="/"
+          className="block py-2 text-gray-600 hover:text-blue-600"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Home
+        </Link>
+        <Link
+          href="/about"
+          className="block py-2 text-gray-600 hover:text-blue-600"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          About
+        </Link>
+        <Link
+          href="/contact"
+          className="block py-2 text-gray-600 hover:text-blue-600"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Contact
+        </Link>
+        <button
+          onClick={() => {
+            onJoinWaitlistClick();
+            setIsMenuOpen(false);
+          }}
+          className="w-full mt-2 bg-gradient-to-b from-blue-700 to-blue-500 text-white px-5 py-2 rounded-2xl font-medium hover:to-blue-700 transition-colors text-sm sm:text-base"
+        >
+          Join the Waitlist
+        </button>
+      </div>
     </header>
   );
 };

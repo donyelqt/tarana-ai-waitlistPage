@@ -41,19 +41,18 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-4xl shadow-2xl w-full max-w-7xl mx-auto flex flex-col md:flex-row overflow-hidden"
+        className="bg-white rounded-4xl shadow-2xl w-full max-w-7xl mx-auto flex flex-col md:flex-row overflow-hidden max-h-screen overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left Side */}
-        <div className="w-full md:w-1/2 p-8 md:p-12 bg-white rounded-t-4xl md:rounded-l-4xl md:rounded-tr-none">
+        <div className="w-full md:w-1/2 p-6 sm:p-8 md:p-12 bg-white rounded-t-4xl md:rounded-l-4xl md:rounded-tr-none">
           <div className="flex items-center space-x-2 mb-6">
-            <Image src="/file.svg" alt="Tarana-ai logo" width={28} height={28} />
-            <span className="text-lg font-bold">Tarana-ai</span>
+            <Image src="/images/taranaai.png" alt="Tarana-ai logo" width={120} height={120} />
           </div>
           <h2 className="text-lg md:text-xl font-bold text-blue-600 mb-2">
             Join our Waitlist
           </h2>
-          <h1 className="text-3xl md:text-4xl font-extrabold mb-4 leading-tight">
+          <h1 className="text-2xl md:text-4xl font-extrabold mb-4 leading-tight">
             Get a Personalized Baguio Trip Plan in Seconds!
           </h1>
           <p className="text-gray-600 mb-8 text-sm md:text-base">
@@ -61,7 +60,7 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
             AI-powered itinerary planner that saves time, avoids crowds, and
             helps you discover hidden gems.
           </p>
-          <div className="flex flex-col sm:flex-row space-y-4 lg:space-x-11 sm:space-y-0 sm:space-x-4 mt-16">
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-6 mt-8 md:mt-16">
             <div className="flex items-center space-x-3">
               <div className="bg-blue-600 text-white p-3 rounded-full">
                 <CiMail size={20} />
@@ -93,7 +92,7 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
         </div>
 
         {/* Right Side */}
-        <div className="w-full bg-gray-100 my-12 mr-8 rounded-4xl pl-8 md:w-1/2 p-8 md:p-12">
+        <div className="w-full bg-gray-100 md:my-12 md:mr-8 rounded-b-4xl md:rounded-4xl md:w-1/2 p-6 sm:p-8 md:p-12">
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -125,7 +124,7 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
             </div>
             <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">Are you a:</label>
-                <div className="flex flex-col sm:flex-row sm:justify-between space-y-2 sm:space-y-0">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:justify-start space-y-2 sm:space-y-0 sm:space-x-4">
                     <label className="flex items-center cursor-pointer p-2 rounded-lg">
                         <input id="tourist" name="userType" type="radio" className="focus:ring-blue-500 h-4 w-4 border-gray-300 accent-blue-600" value="Tourist/Visitor" checked={userType === 'Tourist/Visitor'} onChange={e => setUserType(e.target.value)} />
                         <span className="ml-2 block text-sm text-gray-900">
@@ -148,7 +147,7 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-2xl font-semibold hover:bg-blue-700 transition-colors text-base"
+              className="w-full bg-gradient-to-b from-blue-700 to-blue-500 text-white py-3 rounded-2xl font-semibold hover:to-blue-700 transition-colors text-base"
             >
               Join the Waitlist
             </button>
