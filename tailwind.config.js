@@ -52,16 +52,25 @@ module.exports = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)',
-        "4xl": "2rem",
-		"5xl": "2.5rem",
-		"6xl": "3rem",
-		"7xl": "3.5rem"
-  		}
-  	}
+  		fontFamily: {
+  			sans: [
+  				'var(--font-general-sans)',
+                    ...fontFamily.sans
+                ]
+  		},
+        borderRadius: {
+            lg: 'var(--radius)',
+            md: 'calc(var(--radius) - 2px)',
+            sm: 'calc(var(--radius) - 4px)',
+            "4xl": "2rem",
+            "5xl": "2.5rem",
+            "6xl": "3rem",
+            "7xl": "3.5rem"
+        },
+        maxWidth: {
+            '8xl': '88rem', // 1408px
+        }
+  	},
   },
   plugins: [require("tailwindcss-animate")],
 };

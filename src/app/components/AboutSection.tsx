@@ -1,6 +1,10 @@
 import React from 'react';
 
-const AboutSection = () => {
+type AboutSectionProps = {
+  onJoinWaitlistClick: () => void;
+};
+
+const AboutSection = ({ onJoinWaitlistClick }: AboutSectionProps) => {
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
@@ -13,10 +17,13 @@ const AboutSection = () => {
               Tarana.ai is an AI-powered travel platform that creates real-time, personalized itineraries using live data from traffic, crowd density, weather, and mobility patterns. Built initially for Baguio City, Tarana helps tourists avoid congestion, discover hidden local gems, and enjoy smoother, more meaningful trips.
             </p>
             <p className="text-gray-600 mb-8">
-              By distributing tourist flow and surfacing lesser-known spots, we aim to reduce overtourism, support small businesses, and make urban travel more sustainable. Think of us as the "Waze of Tourism" — helping cities breathe and travelers explore with purpose.
+              By distributing tourist flow and surfacing lesser-known spots, we aim to reduce overtourism, support small businesses, and make urban travel more sustainable. Think of us as the &quot;Waze of Tourism&quot; — helping cities breathe and travelers explore with purpose.
             </p>
             <div className="flex">
-              <button className="bg-gradient-to-b from-blue-700 to-blue-500 text-white font-medium py-3 px-6 rounded-2xl mr-4 hover:to-blue-600 transition-colors">
+              <button
+                onClick={onJoinWaitlistClick}
+                className="bg-gradient-to-b from-blue-700 to-blue-500 text-white font-medium py-3 px-6 rounded-2xl mr-4 hover:to-blue-600 transition-colors"
+              >
                 Join the Waitlist
               </button>
               <button className="bg-white text-blue-500 font-medium py-3 px-6 rounded-2xl border border-blue-500 hover:bg-blue-50 transition-colors">
