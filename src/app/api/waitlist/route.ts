@@ -1,7 +1,50 @@
 import { NextResponse } from "next/server";
-import { put, list } from "@vercel/blob";
+import { put, list, del } from "@vercel/blob";
+
+const LOCK_FILE = "waitlist.lock";
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 300; // 300ms
+
+async function acquireLock() {
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    try {
+      await put(LOCK_FILE, "", {
+        access: "public",
+        addRandomSuffix: false,
+        contentType: "text/plain",
+      });
+      return true;
+    } catch (error: any) {
+      if (error.status === 409) {
+        // Conflict, lock exists
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+      } else {
+        throw error;
+      }
+    }
+  }
+  return false;
+}
+
+async function releaseLock() {
+  try {
+    await del(`${process.env.BLOB_URL}/${LOCK_FILE}`);
+  } catch (error) {
+    console.error("Failed to release lock:", error);
+  }
+}
 
 export async function POST(request: Request) {
+  const lockAcquired = await acquireLock();
+  if (!lockAcquired) {
+    return new NextResponse(
+      JSON.stringify({
+        message: "Server is busy, please try again later.",
+      }),
+      { status: 503 }
+    );
+  }
+
   try {
     const data = await request.json();
     const { name, email, userType } = data;
@@ -13,7 +56,7 @@ export async function POST(request: Request) {
       );
     }
 
-    let waitlist = [];
+    let waitlist: any[] = [];
     try {
       const blobList = await list({ prefix: "waitlist.json", limit: 1 });
       if (blobList.blobs.length > 0) {
@@ -54,6 +97,7 @@ export async function POST(request: Request) {
     await put("waitlist.json", JSON.stringify(waitlist, null, 2), {
       access: "public",
       contentType: "application/json",
+      addRandomSuffix: false,
     });
 
     return new NextResponse(
@@ -66,6 +110,8 @@ export async function POST(request: Request) {
       JSON.stringify({ message: "Internal Server Error" }),
       { status: 500 }
     );
+  } finally {
+    await releaseLock();
   }
 }
 
