@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       const blobList = await list({ prefix: "waitlist.json", limit: 1 });
       if (blobList.blobs.length > 0) {
         const waitlistBlob = blobList.blobs[0];
-        const response = await fetch(waitlistBlob.url);
+        const response = await fetch(waitlistBlob.url, { cache: "no-store" });
         if (response.ok) {
           const content = await response.text();
           if (content) {
@@ -80,7 +80,7 @@ export async function GET() {
     }
 
     const waitlistBlob = blobList.blobs[0];
-    const response = await fetch(waitlistBlob.url);
+    const response = await fetch(waitlistBlob.url, { cache: "no-store" });
 
     if (!response.ok) {
       throw new Error(`Failed to fetch waitlist: ${response.statusText}`);
