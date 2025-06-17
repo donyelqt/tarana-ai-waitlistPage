@@ -67,4 +67,36 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+  try {
+    const blobList = await list({ prefix: "waitlist.json", limit: 1 });
+    if (blobList.blobs.length === 0) {
+      return new NextResponse(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const waitlistBlob = blobList.blobs[0];
+    const response = await fetch(waitlistBlob.url);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch waitlist: ${response.statusText}`);
+    }
+
+    const waitlist = await response.json();
+
+    return new NextResponse(JSON.stringify(waitlist), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Error fetching waitlist:", error);
+    return new NextResponse(
+      JSON.stringify({ message: "Internal Server Error" }),
+      { status: 500 }
+    );
+  }
 } 
