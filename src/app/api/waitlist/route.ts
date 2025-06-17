@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
-
-const jsonFilePath = path.resolve(process.cwd(), "waitlist.json");
+import { put, list } from "@vercel/blob";
 
 export async function POST(request: Request) {
   try {
@@ -18,24 +15,46 @@ export async function POST(request: Request) {
 
     let waitlist = [];
     try {
-      const fileContent = await fs.readFile(jsonFilePath, "utf-8");
-      waitlist = JSON.parse(fileContent);
-    } catch (error) {
-      // If file doesn't exist, it's fine, we'll create it.
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-        console.error("Error reading waitlist file:", error);
-        throw error;
+      const blobList = await list({ prefix: "waitlist.json", limit: 1 });
+      if (blobList.blobs.length > 0) {
+        const waitlistBlob = blobList.blobs[0];
+        const response = await fetch(waitlistBlob.url);
+        if (response.ok) {
+          const content = await response.text();
+          if (content) {
+            waitlist = JSON.parse(content);
+          }
+        } else {
+          console.error(
+            "Failed to fetch waitlist blob content, status:",
+            response.status
+          );
+        }
       }
+    } catch (error) {
+      console.error("Error retrieving waitlist from Vercel Blob:", error);
     }
 
-    waitlist.push({
+    const newUser = {
       name,
       email,
       userType,
       joinedAt: new Date().toISOString(),
-    });
+    };
 
-    await fs.writeFile(jsonFilePath, JSON.stringify(waitlist, null, 2));
+    if (!Array.isArray(waitlist)) {
+      console.warn(
+        "Retrieved waitlist data is not an array. Resetting to a new array with the current user."
+      );
+      waitlist = [newUser];
+    } else {
+      waitlist.push(newUser);
+    }
+
+    await put("waitlist.json", JSON.stringify(waitlist, null, 2), {
+      access: "public",
+      contentType: "application/json",
+    });
 
     return new NextResponse(
       JSON.stringify({ message: "Successfully joined waitlist" }),
