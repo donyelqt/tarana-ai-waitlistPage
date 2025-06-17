@@ -35,7 +35,7 @@ async function acquireLock() {
 
 async function releaseLock() {
   try {
-    await del(`${process.env.BLOB_URL}/${LOCK_FILE}`);
+    await del(LOCK_FILE);
   } catch (error) {
     console.error("Failed to release lock:", error);
   }
