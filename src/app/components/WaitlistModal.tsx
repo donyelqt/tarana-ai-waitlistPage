@@ -32,9 +32,15 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
         });
         onClose();
       } else {
-        const errorData = await response.json();
-        const message =
-          errorData.message || "Something went wrong. Please try again.";
+        let message = "Something went wrong. Please try again.";
+        try {
+          const errorData = await response.json();
+          if (errorData && errorData.message) {
+            message = errorData.message;
+          }
+        } catch (jsonError) {
+          console.error("Failed to parse error response as JSON:", jsonError, response);
+        }
         alert(message);
       }
     } catch (error) {

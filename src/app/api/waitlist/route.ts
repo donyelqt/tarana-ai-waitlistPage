@@ -9,20 +9,133 @@ interface WaitlistUser {
 }
 
 const LOCK_FILE = "waitlist.lock";
+const WAITLIST_FILE = "waitlist.json";
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 300; // 300ms
+const LOCK_TIMEOUT_MS = 10000; // 10 seconds
 
-async function acquireLock() {
+interface LockData {
+  timestamp: number;
+  id: string;
+}
+
+interface WaitlistOperationResult {
+  success: boolean;
+  data?: WaitlistUser[];
+  error?: string;
+}
+
+async function readWaitlistFile(): Promise<WaitlistOperationResult> {
+  try {
+    console.log("Attempting to read waitlist.json...");
+    const blobList = await list({ prefix: WAITLIST_FILE, limit: 1 });
+    
+    if (blobList.blobs.length === 0) {
+      console.log("No waitlist.json found, returning empty array");
+      return { success: true, data: [] };
+    }
+
+    const waitlistBlob = blobList.blobs[0];
+    console.log(`Found waitlist.json, URL: ${waitlistBlob.url}`);
+    
+    const response = await fetch(waitlistBlob.url, { cache: "no-store" });
+    if (!response.ok) {
+      return { 
+        success: false, 
+        error: `Failed to fetch waitlist blob: ${response.status} ${response.statusText}` 
+      };
+    }
+
+    const content = await response.text();
+    if (!content.trim()) {
+      console.log("waitlist.json is empty, returning empty array");
+      return { success: true, data: [] };
+    }
+
+    const waitlist = JSON.parse(content);
+    if (!Array.isArray(waitlist)) {
+      return { 
+        success: false, 
+        error: "Waitlist data is corrupted (not an array)" 
+      };
+    }
+
+    console.log(`Successfully read waitlist with ${waitlist.length} entries`);
+    return { success: true, data: waitlist };
+  } catch (error) {
+    console.error("Error reading waitlist file:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error reading waitlist" 
+    };
+  }
+}
+
+async function writeWaitlistFile(waitlist: WaitlistUser[]): Promise<WaitlistOperationResult> {
+  try {
+    console.log(`Attempting to write ${waitlist.length} entries to waitlist.json...`);
+    await put(WAITLIST_FILE, JSON.stringify(waitlist, null, 2), {
+      access: "public",
+      contentType: "application/json",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+    });
+    console.log("Successfully wrote waitlist.json");
+    return { success: true, data: waitlist };
+  } catch (error) {
+    console.error("Error writing waitlist file:", error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Unknown error writing waitlist" 
+    };
+  }
+}
+
+async function checkLockAge(): Promise<boolean> {
+  try {
+    const blobList = await list({ prefix: LOCK_FILE, limit: 1 });
+    if (blobList.blobs.length === 0) return false;
+
+    const lockBlob = blobList.blobs[0];
+    const response = await fetch(lockBlob.url, { cache: "no-store" });
+    if (!response.ok) return false;
+
+    const lockData = await response.json() as LockData;
+    const age = Date.now() - lockData.timestamp;
+    console.log(`Lock age: ${age}ms`);
+    
+    return age > LOCK_TIMEOUT_MS;
+  } catch (error) {
+    console.error("Error checking lock age:", error);
+    return false;
+  }
+}
+
+async function acquireLock(): Promise<{ success: boolean; lockId?: string }> {
   console.log("Attempting to acquire lock...");
+  const lockId = Math.random().toString(36).substring(2);
+  
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
-      await put(LOCK_FILE, "", {
+      // Check if there's a stale lock
+      const isStale = await checkLockAge();
+      if (isStale) {
+        console.log("Found stale lock, attempting to remove it...");
+        await del(LOCK_FILE);
+      }
+
+      const lockData: LockData = {
+        timestamp: Date.now(),
+        id: lockId
+      };
+
+      await put(LOCK_FILE, JSON.stringify(lockData), {
         access: "public",
         addRandomSuffix: false,
-        contentType: "text/plain",
+        contentType: "application/json",
       });
-      console.log("Lock acquired successfully.");
-      return true;
+      console.log(`Lock acquired successfully with ID: ${lockId}`);
+      return { success: true, lockId };
     } catch (error) {
       if ((error as { status?: number })?.status === 409) {
         console.log(`Lock conflict. Retrying... (Attempt ${i + 1})`);
@@ -34,29 +147,47 @@ async function acquireLock() {
     }
   }
   console.log("Failed to acquire lock after multiple retries.");
-  return false;
+  return { success: false };
 }
 
-async function releaseLock() {
+async function releaseLock(lockId: string) {
   try {
-    console.log("Releasing lock...");
-    await del(LOCK_FILE);
+    console.log(`Attempting to release lock with ID: ${lockId}`);
+    
+    // Verify we own the lock before releasing
+    const blobList = await list({ prefix: LOCK_FILE, limit: 1 });
+    if (blobList.blobs.length > 0) {
+      const lockBlob = blobList.blobs[0];
+      const response = await fetch(lockBlob.url, { cache: "no-store" });
+      if (response.ok) {
+        const lockData = await response.json() as LockData;
+        if (lockData.id !== lockId) {
+          console.log("Lock ID mismatch, not releasing lock");
+          return;
+        }
+      }
+    }
+    
+    const result = await del(LOCK_FILE);
+    console.log("Lock deletion result:", result);
     console.log("Lock released successfully.");
   } catch (error) {
     console.error("Failed to release lock:", error);
+    throw error; // Propagate the error for better error handling
   }
 }
 
 export async function POST(request: Request) {
   console.log("POST /api/waitlist request received.");
-  const lockAcquired = await acquireLock();
-  if (!lockAcquired) {
+  const { success, lockId } = await acquireLock();
+  if (!success) {
     console.error("Could not acquire lock, returning 503.");
     return new NextResponse(
       JSON.stringify({
         message: "Server is busy, please try again later.",
+        error: "Failed to acquire lock"
       }),
-      { status: 503 }
+      { status: 503, headers: { "Content-Type": "application/json" } }
     );
   }
 
@@ -66,49 +197,27 @@ export async function POST(request: Request) {
     const { name, email, userType } = data;
 
     if (!name || !email || !userType) {
-      console.error("Request missing required fields.");
+      console.error("Request missing required fields:", { name, email, userType });
       return new NextResponse(
-        JSON.stringify({ message: "Missing required fields" }),
-        { status: 400 }
+        JSON.stringify({ 
+          message: "Missing required fields",
+          details: {
+            name: !name ? "missing" : "ok",
+            email: !email ? "missing" : "ok",
+            userType: !userType ? "missing" : "ok"
+          }
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
     console.log(`Received data for user: ${email}`);
 
-    let waitlist: WaitlistUser[] = [];
-    try {
-      console.log("Checking for existing waitlist.json blob.");
-      const blobList = await list({ prefix: "waitlist.json", limit: 1 });
-      if (blobList.blobs.length > 0) {
-        const waitlistBlob = blobList.blobs[0];
-        console.log(`Found waitlist.json, URL: ${waitlistBlob.url}`);
-        const response = await fetch(waitlistBlob.url, { cache: "no-store" });
-        if (response.ok) {
-          const content = await response.text();
-          if (content) {
-            console.log("Parsing waitlist content.");
-            waitlist = JSON.parse(content);
-            console.log(
-              `Successfully parsed waitlist. Current count: ${waitlist.length}`
-            );
-          } else {
-            console.log("waitlist.json is empty. Initializing new list.");
-          }
-        } else {
-          console.error(
-            "Failed to fetch waitlist blob content, status:",
-            response.status
-          );
-        }
-      } else {
-        console.log("No waitlist.json found. Initializing new list.");
-      }
-    } catch (error) {
-      console.error(
-        "Error retrieving or parsing waitlist from Vercel Blob:",
-        error
-      );
+    const readResult = await readWaitlistFile();
+    if (!readResult.success) {
+      throw new Error(`Failed to read waitlist: ${readResult.error}`);
     }
 
+    const waitlist = readResult.data!;
     const newUser = {
       name,
       email,
@@ -116,36 +225,69 @@ export async function POST(request: Request) {
       joinedAt: new Date().toISOString(),
     };
 
-    if (!Array.isArray(waitlist)) {
-      console.warn(
-        "Retrieved waitlist data is not an array. Resetting to a new array with the current user."
-      );
-      waitlist = [newUser];
-    } else {
-      waitlist.push(newUser);
-    }
+    waitlist.push(newUser);
     console.log(`New waitlist count: ${waitlist.length}`);
 
-    console.log("Uploading updated waitlist.json.");
-    await put("waitlist.json", JSON.stringify(waitlist, null, 2), {
-      access: "public",
-      contentType: "application/json",
-      addRandomSuffix: false,
-    });
-    console.log("Successfully uploaded waitlist.json.");
+    const writeResult = await writeWaitlistFile(waitlist);
+    if (!writeResult.success) {
+      throw new Error(`Failed to write waitlist: ${writeResult.error}`);
+    }
 
     return new NextResponse(
-      JSON.stringify({ message: "Successfully joined waitlist" }),
-      { status: 200 }
+      JSON.stringify({ 
+        message: "Successfully joined waitlist",
+        position: waitlist.length 
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("An unexpected error occurred in POST handler:", error);
     return new NextResponse(
-      JSON.stringify({ message: "Internal Server Error" }),
-      { status: 500 }
+      JSON.stringify({ 
+        message: "Internal Server Error",
+        error: error instanceof Error ? error.message : "Unknown error"
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   } finally {
-    await releaseLock();
+    if (lockId) {
+      try {
+        await releaseLock(lockId);
+      } catch (error) {
+        console.error("Failed to release lock in finally block:", error);
+      }
+    }
+  }
+}
+
+// Admin endpoint to force-delete the lock file
+export async function DELETE(request: Request) {
+  try {
+    // Basic auth check - you should replace this with proper auth
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new NextResponse(
+        JSON.stringify({ message: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log("Force-deleting lock file...");
+    await del(LOCK_FILE);
+    
+    return new NextResponse(
+      JSON.stringify({ message: "Lock file deleted successfully" }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Error force-deleting lock:", error);
+    return new NextResponse(
+      JSON.stringify({ 
+        message: "Failed to delete lock",
+        error: error instanceof Error ? error.message : "Unknown error"
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 
@@ -178,5 +320,34 @@ export async function GET() {
       JSON.stringify({ message: "Internal Server Error" }),
       { status: 500 }
     );
+  }
+}
+
+export async function HEAD() {
+  try {
+    const blobList = await list({ prefix: LOCK_FILE, limit: 1 });
+    if (blobList.blobs.length === 0) {
+      return new NextResponse(null, { status: 404 });
+    }
+
+    const lockBlob = blobList.blobs[0];
+    const response = await fetch(lockBlob.url, { cache: "no-store" });
+    if (!response.ok) {
+      return new NextResponse(null, { status: 500 });
+    }
+
+    const lockData = await response.json() as LockData;
+    const age = Date.now() - lockData.timestamp;
+    
+    return new NextResponse(null, { 
+      status: 200,
+      headers: { 
+        'X-Lock-Age': age.toString(),
+        'X-Lock-Id': lockData.id
+      }
+    });
+  } catch (error) {
+    console.error("Error checking lock status:", error);
+    return new NextResponse(null, { status: 500 });
   }
 } 
