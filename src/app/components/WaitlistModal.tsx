@@ -57,7 +57,7 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-4xl shadow-2xl w-full max-w-7xl mx-auto flex flex-col md:flex-row overflow-hidden max-h-screen overflow-y-auto"
+        className="bg-white rounded-4xl shadow-2xl w-[90%] max-w-7xl mx-auto flex flex-col md:flex-row overflow-hidden max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left Side */}
