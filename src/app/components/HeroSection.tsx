@@ -12,7 +12,7 @@ const HeroSection = ({ onJoinWaitlistClick }: HeroSectionProps) => {
         <section className="w-full px-4 pt-12 sm:pt-16">
             <div className="max-w-7xl mx-auto flex flex-col items-center">
                 {/* Heading */}
-                <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold text-center mb-6 max-w-4xl">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-semibold text-center mb-6 max-w-4xl">
                     Plan Your Perfect <span className="text-blue-600">Baguio Trip</span>
                     <br />
                     in Seconds
