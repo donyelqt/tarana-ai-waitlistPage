@@ -1,10 +1,17 @@
 import Link from "next/link"
+import { usePathname } from "next/navigation";
 
 type FooterProps = {
   onJoinWaitlistClick: () => void;
 };
 
 const Footer = ({ onJoinWaitlistClick }: FooterProps) => {
+  const pathname = usePathname();
+  const normalize = (path: string) => path.replace(/\/$/, "");
+  const navLinkClass = (href: string) =>
+    normalize(pathname) === normalize(href)
+      ? "text-blue-700 font-semibold"
+      : "text-gray-600 hover:text-blue-700";
   return (
     <section className="p-6">
       <div className="max-w-7xl mx-auto text-center px-4 bg-gradient-to-b from-blue-700 to-blue-500 text-white py-20 rounded-7xl mt-8">
@@ -34,15 +41,9 @@ const Footer = ({ onJoinWaitlistClick }: FooterProps) => {
           </Link>
 
           <div className="flex space-x-8 mb-4 md:mb-0">
-            <Link href="/" className="hover:text-blue-700">
-              Home
-            </Link>
-            <Link href="/about" className="hover:text-blue-700">
-              About
-            </Link>
-            <Link href="#" className="hover:text-blue-700">
-              Contact
-            </Link>
+            <Link href="/" className={navLinkClass("/")}>Home</Link>
+            <Link href="/about" className={navLinkClass("/about")}>About</Link>
+            <Link href="/contact" className={navLinkClass("/contact")}>Contact</Link>
           </div>
 
           <div className="flex space-x-6">

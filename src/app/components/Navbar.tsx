@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 type NavbarProps = {
   onJoinWaitlistClick: () => void;
@@ -11,6 +12,14 @@ type NavbarProps = {
 
 const Navbar = ({ onJoinWaitlistClick }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+  console.log('Navbar pathname:', pathname);
+
+  const normalize = (path: string) => path.replace(/\/$/, "");
+  const navLinkClass = (href: string, base?: string) =>
+    normalize(pathname) === normalize(href)
+      ? `${base ? base + " " : ""}text-blue-600 font-semibold`
+      : `${base ? base + " " : ""}text-gray-600 hover:text-blue-600`;
 
   return (
     <header className="py-4 px-4 sm:px-6 md:px-8 relative">
@@ -27,9 +36,9 @@ const Navbar = ({ onJoinWaitlistClick }: NavbarProps) => {
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link href="/" className="text-gray-600 hover:text-blue-600">Home</Link>
-          <Link href="/about" className="text-gray-600 hover:text-blue-600">About</Link>
-          <Link href="/contact" className="text-gray-600 hover:text-blue-600">Contact</Link>
+          <Link href="/" className={navLinkClass("/")}>Home</Link>
+          <Link href="/about" className={navLinkClass("/about")}>About</Link>
+          <Link href="/contact" className={navLinkClass("/contact")}>Contact</Link>
         </div>
 
         {/* CTA Button */}
@@ -63,21 +72,21 @@ const Navbar = ({ onJoinWaitlistClick }: NavbarProps) => {
       >
         <Link
           href="/"
-          className="block py-2 text-gray-600 hover:text-blue-600"
+          className={navLinkClass("/", "block py-2")}
           onClick={() => setIsMenuOpen(false)}
         >
           Home
         </Link>
         <Link
           href="/about"
-          className="block py-2 text-gray-600 hover:text-blue-600"
+          className={navLinkClass("/about", "block py-2")}
           onClick={() => setIsMenuOpen(false)}
         >
           About
         </Link>
         <Link
           href="/contact"
-          className="block py-2 text-gray-600 hover:text-blue-600"
+          className={navLinkClass("/contact", "block py-2")}
           onClick={() => setIsMenuOpen(false)}
         >
           Contact
