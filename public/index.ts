@@ -9,5 +9,9 @@ import solo_travel from "./images/solo_travel.png";
 import couples from "./images/couples.png";
 import family from "./images/family.png";
 import barkadas from "./images/barkadas.png";
+import mainlogo from "./images/mainlogo.png";
 
-export { waitlistlandingpage, explore, letai, set, local, personalized, traffic, solo_travel, couples, family, barkadas };
+export { waitlistlandingpage, explore, letai, set, local, 
+    personalized, traffic, solo_travel, couples, family, barkadas,
+    mainlogo,
+ };

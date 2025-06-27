@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { mainlogo } from '../../../../public';
 
 type AboutSectionProps = {
   onJoinWaitlistClick: () => void;
@@ -34,7 +35,7 @@ const AboutIntro = ({ onJoinWaitlistClick }: AboutSectionProps) => {
           </div>
           <div className="md:w-1/2 mt-12 md:mt-0">
             <Image
-              src={'/images/taranaai.png'}
+              src={mainlogo}
               alt="Tarana AI Main Logo"
               width={800}
               height={800}
