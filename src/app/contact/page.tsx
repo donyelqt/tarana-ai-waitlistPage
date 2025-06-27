@@ -15,7 +15,7 @@ export default function ContactPage() {
         <div className="w-full max-w-7xl flex flex-col md:flex-row gap-12 md:gap-0 mt-16 md:mt-0">
           {/* Left Section */}
           <div className="flex-1 flex flex-col justify-center md:items-start items-center md:pl-8">
-            <h1 className="text-5xl md:text-6xl font-bold text-[#1A2530] mb-6 text-left w-full">Contact Us</h1>
+            <h1 className="text-5xl md:text-6xl font-medium text-[#1A2530] mb-6 text-left w-full">Contact Us</h1>
             <p className="text-[#5A6473] text-lg mb-10 max-w-md text-left w-full">
               Whether you&#39;re a traveler, business owner, city official, or curious supporter — we&#39;re here to answer your questions and explore meaningful partnerships.
             </p>

@@ -24,7 +24,7 @@ const AboutIntro = ({ onJoinWaitlistClick }: AboutSectionProps) => {
             <div className="flex">
               <button
                 onClick={onJoinWaitlistClick}
-                className="bg-gradient-to-b from-blue-700 to-blue-500 text-white font-medium py-3 px-6 rounded-2xl mr-4 hover:to-blue-600 transition-colors"
+                className="bg-gradient-to-b from-blue-700 to-blue-500 text-white font-semibold py-3 px-6 rounded-2xl mr-4 hover:to-blue-600 transition-colors"
               >
                 Join the Waitlist
               </button>

@@ -22,7 +22,7 @@ const Navbar = ({ onJoinWaitlistClick }: NavbarProps) => {
       : `${base ? base + " " : ""}text-gray-600 hover:text-blue-600`;
 
   return (
-    <header className="py-4 px-4 sm:px-6 md:px-8 relative">
+    <header className="font-sans py-4 px-4 sm:px-6 md:px-8 relative">
       <nav className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
@@ -45,7 +45,7 @@ const Navbar = ({ onJoinWaitlistClick }: NavbarProps) => {
         <div className="hidden md:block">
             <button
             onClick={onJoinWaitlistClick}
-            className="bg-gradient-to-b from-blue-700 to-blue-500 text-white px-5 py-2 rounded-2xl font-medium hover:to-blue-700 transition-colors text-sm sm:text-base"
+            className="bg-gradient-to-b from-blue-700 to-blue-500 text-white px-5 py-2 min-w-[160px] rounded-2xl font-semibold hover:to-blue-700 transition-colors text-sm sm:text-base"
             >
             Join the Waitlist
             </button>
@@ -96,7 +96,7 @@ const Navbar = ({ onJoinWaitlistClick }: NavbarProps) => {
             onJoinWaitlistClick();
             setIsMenuOpen(false);
           }}
-          className="w-full mt-2 bg-gradient-to-b from-blue-700 to-blue-500 text-white px-5 py-2 rounded-2xl font-medium hover:to-blue-700 transition-colors text-sm sm:text-base"
+          className="w-full mt-2 bg-gradient-to-b from-blue-700 to-blue-500 text-white px-5 py-2 min-w-[160px] rounded-2xl font-semibold hover:to-blue-700 transition-colors text-sm sm:text-base"
         >
           Join the Waitlist
         </button>
