@@ -2,6 +2,9 @@
 
 import AboutIntro from "../components/about/AboutIntro";
 import Navbar from "../components/Navbar";
+import AboutSmartTravel from "../components/about/AboutSmartTravel";
+import AboutPotentialImpact from "../components/about/AboutPotentialImpact";
+import AboutTeam from "../components/about/AboutTeam";
 
 export default function AboutPage() {
   return (
@@ -9,9 +12,9 @@ export default function AboutPage() {
       <Navbar onJoinWaitlistClick={() => {}} />
       <main>
         <AboutIntro onJoinWaitlistClick={() => {}} />
-        {/* <AboutSmartTravel />
+        <AboutSmartTravel />
         <AboutPotentialImpact />
-        <AboutTeam /> */}
+        <AboutTeam /> 
       </main>
     </div>
   );
