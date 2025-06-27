@@ -4,7 +4,6 @@ import { useState } from "react";
 import HeroSection from "./components/HeroSection";
 import Navbar from "./components/Navbar";
 import HowItWorksSection from "./components/HowItWorks";
-import AboutSection from "./components/AboutSection";
 import WhyUseSection from "./components/WhyUseSection";
 import TravelersSection from "./components/TravelersSection";
 import Footer from "./components/Footer";
@@ -21,7 +20,6 @@ export default function Home() {
       <Navbar onJoinWaitlistClick={openModal} />
       <HeroSection onJoinWaitlistClick={openModal} />
       <HowItWorksSection />
-      <AboutSection onJoinWaitlistClick={openModal} />
       <WhyUseSection />
       <TravelersSection />
       <Footer onJoinWaitlistClick={openModal} />
