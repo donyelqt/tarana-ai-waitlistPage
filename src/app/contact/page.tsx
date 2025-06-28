@@ -6,39 +6,6 @@ import WaitlistModal from "../components/WaitlistModal";
 
 export default function ContactPage() {
   const [modalOpen, setModalOpen] = useState(false);
-  // Contact form state
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subject, message }),
-      });
-      if (res.ok) {
-        alert("Message sent successfully!");
-        setName("");
-        setEmail("");
-        setSubject("");
-        setMessage("");
-      } else {
-        const data = await res.json();
-        alert(data.message || "Failed to send message.");
-      }
-    } catch (err) {
-      alert("An error occurred. Please try again later.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar onJoinWaitlistClick={() => setModalOpen(true)} />
