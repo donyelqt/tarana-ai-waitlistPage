@@ -153,7 +153,7 @@ async function acquireLock(): Promise<{ success: boolean; lockId?: string }> {
         access: "public",
         addRandomSuffix: false,
         contentType: "application/json",
-        allowOverwrite: false, // Explicitly do not overwrite
+        allowOverwrite: true, // Explicitly do not overwrite
       });
       console.log(`Lock acquired successfully with ID: ${lockId}`);
       return { success: true, lockId };
