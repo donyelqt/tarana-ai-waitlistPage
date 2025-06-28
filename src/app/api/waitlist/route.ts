@@ -25,10 +25,12 @@ interface WaitlistOperationResult {
   error?: string;
 }
 
+const token = process.env.BLOB_READ_WRITE_TOKEN;
+
 async function readWaitlistFile(): Promise<WaitlistOperationResult> {
   try {
     console.log("Attempting to read waitlist.json...");
-    const blobList = await list({ prefix: WAITLIST_FILE, limit: 1 });
+    const blobList = await list({ prefix: WAITLIST_FILE, limit: 1, token });
     
     if (blobList.blobs.length === 0) {
       console.log("No waitlist.json found, returning empty array");
@@ -79,6 +81,7 @@ async function writeWaitlistFile(waitlist: WaitlistUser[]): Promise<WaitlistOper
       contentType: "application/json",
       addRandomSuffix: false,
       allowOverwrite: true,
+      token,
     });
     console.log("Successfully wrote waitlist.json");
     return { success: true, data: waitlist };
@@ -93,7 +96,7 @@ async function writeWaitlistFile(waitlist: WaitlistUser[]): Promise<WaitlistOper
 
 async function checkLockAge(): Promise<boolean> {
   try {
-    const blobList = await list({ prefix: LOCK_FILE, limit: 1 });
+    const blobList = await list({ prefix: LOCK_FILE, limit: 1, token });
     if (blobList.blobs.length === 0) return false;
 
     const lockBlob = blobList.blobs[0];
@@ -121,7 +124,7 @@ async function acquireLock(): Promise<{ success: boolean; lockId?: string }> {
       const isStale = await checkLockAge();
       if (isStale) {
         console.log("Found stale lock, attempting to remove it...");
-        await del(LOCK_FILE);
+        await del(LOCK_FILE, { token });
       }
 
       const lockData: LockData = {
@@ -133,6 +136,7 @@ async function acquireLock(): Promise<{ success: boolean; lockId?: string }> {
         access: "public",
         addRandomSuffix: false,
         contentType: "application/json",
+        token,
       });
       console.log(`Lock acquired successfully with ID: ${lockId}`);
       return { success: true, lockId };
@@ -155,7 +159,7 @@ async function releaseLock(lockId: string) {
     console.log(`Attempting to release lock with ID: ${lockId}`);
     
     // Verify we own the lock before releasing
-    const blobList = await list({ prefix: LOCK_FILE, limit: 1 });
+    const blobList = await list({ prefix: LOCK_FILE, limit: 1, token });
     if (blobList.blobs.length > 0) {
       const lockBlob = blobList.blobs[0];
       const response = await fetch(lockBlob.url, { cache: "no-store" });
@@ -168,7 +172,7 @@ async function releaseLock(lockId: string) {
       }
     }
     
-    const result = await del(LOCK_FILE);
+    const result = await del(LOCK_FILE, { token });
     console.log("Lock deletion result:", result);
     console.log("Lock released successfully.");
   } catch (error) {
@@ -273,7 +277,7 @@ export async function DELETE(request: Request) {
     }
 
     console.log("Force-deleting lock file...");
-    await del(LOCK_FILE);
+    await del(LOCK_FILE, { token });
     
     return new NextResponse(
       JSON.stringify({ message: "Lock file deleted successfully" }),
@@ -293,7 +297,7 @@ export async function DELETE(request: Request) {
 
 export async function GET() {
   try {
-    const blobList = await list({ prefix: "waitlist.json", limit: 1 });
+    const blobList = await list({ prefix: "waitlist.json", limit: 1, token });
     if (blobList.blobs.length === 0) {
       return new NextResponse(JSON.stringify([]), {
         status: 200,
@@ -325,7 +329,7 @@ export async function GET() {
 
 export async function HEAD() {
   try {
-    const blobList = await list({ prefix: LOCK_FILE, limit: 1 });
+    const blobList = await list({ prefix: LOCK_FILE, limit: 1, token });
     if (blobList.blobs.length === 0) {
       return new NextResponse(null, { status: 404 });
     }

@@ -6,6 +6,39 @@ import WaitlistModal from "../components/WaitlistModal";
 
 export default function ContactPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  // Contact form state
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+      if (res.ok) {
+        alert("Message sent successfully!");
+        setName("");
+        setEmail("");
+        setSubject("");
+        setMessage("");
+      } else {
+        const data = await res.json();
+        alert(data.message || "Failed to send message.");
+      }
+    } catch (err) {
+      alert("An error occurred. Please try again later.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar onJoinWaitlistClick={() => setModalOpen(true)} />
@@ -71,24 +104,24 @@ export default function ContactPage() {
           </div>
           {/* Right Section (Form) */}
           <div className="flex-1 flex justify-center items-center">
-            <form className="w-full max-w-lg bg-[#F5F8FB] rounded-4xl p-8 md:p-12 flex flex-col gap-6 shadow-none">
+            <form className="w-full max-w-lg bg-[#F5F8FB] rounded-4xl p-8 md:p-12 flex flex-col gap-6 shadow-none" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-[#1A2530] font-semibold mb-2" htmlFor="name">Name</label>
-                <input id="name" type="text" placeholder="Enter your full name" className="w-full px-4 py-3 rounded-2xl bg-white border-none focus:ring-2 focus:ring-[#156FF5] text-[#1A2530] placeholder-[#A0AEC0] text-base outline-none" />
+                <input id="name" type="text" placeholder="Enter your full name" className="w-full px-4 py-3 rounded-2xl bg-white border-none focus:ring-2 focus:ring-[#156FF5] text-[#1A2530] placeholder-[#A0AEC0] text-base outline-none" value={name} onChange={e => setName(e.target.value)} required />
               </div>
               <div>
                 <label className="block text-[#1A2530] font-semibold mb-2" htmlFor="email">Email Address</label>
-                <input id="email" type="email" placeholder="Enter your email address" className="w-full px-4 py-3 rounded-2xl bg-white border-none focus:ring-2 focus:ring-[#156FF5] text-[#1A2530] placeholder-[#A0AEC0] text-base outline-none" />
+                <input id="email" type="email" placeholder="Enter your email address" className="w-full px-4 py-3 rounded-2xl bg-white border-none focus:ring-2 focus:ring-[#156FF5] text-[#1A2530] placeholder-[#A0AEC0] text-base outline-none" value={email} onChange={e => setEmail(e.target.value)} required />
               </div>
               <div>
                 <label className="block text-[#1A2530] font-semibold mb-2" htmlFor="subject">Subject</label>
-                <input id="subject" type="text" placeholder="e.g. Partnership Inquiry, Feedback, Support" className="w-full px-4 py-3 rounded-2xl bg-white border-none focus:ring-2 focus:ring-[#156FF5] text-[#1A2530] placeholder-[#A0AEC0] text-base outline-none" />
+                <input id="subject" type="text" placeholder="e.g. Partnership Inquiry, Feedback, Support" className="w-full px-4 py-3 rounded-2xl bg-white border-none focus:ring-2 focus:ring-[#156FF5] text-[#1A2530] placeholder-[#A0AEC0] text-base outline-none" value={subject} onChange={e => setSubject(e.target.value)} required />
               </div>
               <div>
-                <label className="block text-[#1A2530] font-semibold mb-2" htmlFor="message">Subject</label>
-                <textarea id="message" rows={5} placeholder="e.g. Partnership Inquiry, Feedback, Support" className="w-full px-4 py-3 rounded-2xl bg-white border-none focus:ring-2 focus:ring-[#156FF5] text-[#1A2530] placeholder-[#A0AEC0] text-base outline-none resize-none" />
+                <label className="block text-[#1A2530] font-semibold mb-2" htmlFor="message">Message</label>
+                <textarea id="message" rows={5} placeholder="Type your message here..." className="w-full px-4 py-3 rounded-2xl bg-white border-none focus:ring-2 focus:ring-[#156FF5] text-[#1A2530] placeholder-[#A0AEC0] text-base outline-none resize-none" value={message} onChange={e => setMessage(e.target.value)} required />
               </div>
-                <button type="submit" className="w-full mt-2 py-3 rounded-2xl bg-gradient-to-b from-blue-700 to-blue-500 text-white font-medium text-lg shadow-none hover:opacity-90 hover:to-blue-700 transition-colors">Submit</button>
+                <button type="submit" className="w-full mt-2 py-3 rounded-2xl bg-gradient-to-b from-blue-700 to-blue-500 text-white font-medium text-lg shadow-none hover:opacity-90 hover:to-blue-700 transition-colors" disabled={submitting}>{submitting ? "Sending..." : "Submit"}</button>
             </form>
           </div>
         </div>
