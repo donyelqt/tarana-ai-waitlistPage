@@ -266,9 +266,18 @@ export async function POST(request: Request) {
 // Admin endpoint to force-delete the lock file
 export async function DELETE(request: Request) {
   try {
-    // Basic auth check - you should replace this with proper auth
     const authHeader = request.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+    if (!blobToken) {
+      console.error("BLOB_READ_WRITE_TOKEN is not set in environment variables.");
+      return new NextResponse(
+        JSON.stringify({ message: "Internal Server Error: Blob token not configured." }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    if (authHeader !== `Bearer ${blobToken}`) {
       return new NextResponse(
         JSON.stringify({ message: "Unauthorized" }),
         { status: 401, headers: { "Content-Type": "application/json" } }
