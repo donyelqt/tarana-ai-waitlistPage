@@ -91,26 +91,6 @@ async function writeWaitlistFile(waitlist: WaitlistUser[]): Promise<WaitlistOper
   }
 }
 
-async function checkLockAge(): Promise<boolean> {
-  try {
-    const blobList = await list({ prefix: LOCK_FILE, limit: 1 });
-    if (blobList.blobs.length === 0) return false;
-
-    const lockBlob = blobList.blobs[0];
-    const response = await fetch(lockBlob.url, { cache: "no-store" });
-    if (!response.ok) return false;
-
-    const lockData = await response.json() as LockData;
-    const age = Date.now() - lockData.timestamp;
-    console.log(`Lock age: ${age}ms`);
-    
-    return age > LOCK_TIMEOUT_MS;
-  } catch (error) {
-    console.error("Error checking lock age:", error);
-    return false;
-  }
-}
-
 async function acquireLock(): Promise<{ success: boolean; lockId?: string }> {
   console.log("Attempting to acquire lock...");
   const lockId = Math.random().toString(36).substring(2);
@@ -157,9 +137,10 @@ async function acquireLock(): Promise<{ success: boolean; lockId?: string }> {
       });
       console.log(`Lock acquired successfully with ID: ${lockId}`);
       return { success: true, lockId };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Vercel Blob returns status 409 for already exists
-      if (error?.status === 409 || (error?.message && error.message.includes('already exists'))) {
+      const err = error as { status?: number; message?: string };
+      if (err?.status === 409 || (err?.message && err.message.includes('already exists'))) {
         console.log(`Lock conflict (409). Retrying in ${RETRY_DELAY}ms (Attempt ${i + 1})`);
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
       } else {
