@@ -32,7 +32,7 @@ export default function ContactPage() {
         const data = await res.json();
         alert(data.message || "Failed to send message.");
       }
-    } catch (err) {
+    } catch {
       alert("An error occurred. Please try again later.");
     } finally {
       setSubmitting(false);
