@@ -114,15 +114,35 @@ async function checkLockAge(): Promise<boolean> {
 async function acquireLock(): Promise<{ success: boolean; lockId?: string }> {
   console.log("Attempting to acquire lock...");
   const lockId = Math.random().toString(36).substring(2);
-  
+
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
-      // Check if there's a stale lock
-      const isStale = await checkLockAge();
-      if (isStale) {
-        console.log("Found stale lock, attempting to remove it...");
-        await del(LOCK_FILE);
+      // Check if lock file exists
+      const blobList = await list({ prefix: LOCK_FILE, limit: 1 });
+      let canCreateLock = true;
+      if (blobList.blobs.length > 0) {
+        // Lock file exists, check if it's stale
+        const lockBlob = blobList.blobs[0];
+        const response = await fetch(lockBlob.url, { cache: "no-store" });
+        if (response.ok) {
+          const lockData = await response.json() as LockData;
+          const age = Date.now() - lockData.timestamp;
+          console.log(`Lock file exists. Age: ${age}ms`);
+          if (age > LOCK_TIMEOUT_MS) {
+            console.log("Found stale lock, attempting to remove it...");
+            await del(LOCK_FILE);
+          } else {
+            // Lock is not stale, wait and retry
+            console.log(`Lock is not stale. Retrying in ${RETRY_DELAY}ms (Attempt ${i + 1})`);
+            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+            canCreateLock = false;
+          }
+        } else {
+          // Could not fetch lock blob, treat as if we can try to create
+          console.log("Could not fetch lock blob, proceeding to create lock.");
+        }
       }
+      if (!canCreateLock) continue;
 
       const lockData: LockData = {
         timestamp: Date.now(),
@@ -133,12 +153,14 @@ async function acquireLock(): Promise<{ success: boolean; lockId?: string }> {
         access: "public",
         addRandomSuffix: false,
         contentType: "application/json",
+        allowOverwrite: false, // Explicitly do not overwrite
       });
       console.log(`Lock acquired successfully with ID: ${lockId}`);
       return { success: true, lockId };
-    } catch (error) {
-      if ((error as { status?: number })?.status === 409) {
-        console.log(`Lock conflict. Retrying... (Attempt ${i + 1})`);
+    } catch (error: any) {
+      // Vercel Blob returns status 409 for already exists
+      if (error?.status === 409 || (error?.message && error.message.includes('already exists'))) {
+        console.log(`Lock conflict (409). Retrying in ${RETRY_DELAY}ms (Attempt ${i + 1})`);
         await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
       } else {
         console.error("Error acquiring lock:", error);
