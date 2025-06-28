@@ -7,6 +7,7 @@ import AboutSmartTravel from "../components/about/AboutSmartTravel";
 import AboutPotentialImpact from "../components/about/AboutPotentialImpact";
 import AboutTeam from "../components/about/AboutTeam";
 import WaitlistModal from "../components/WaitlistModal";
+import Footer from "../components/Footer";
 
 export default function AboutPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +21,7 @@ export default function AboutPage() {
         <AboutSmartTravel />
         <AboutPotentialImpact />
         <AboutTeam />
+        <Footer onJoinWaitlistClick={openModal} />
       </main>
       {isModalOpen && <WaitlistModal onClose={closeModal} />}
     </div>
