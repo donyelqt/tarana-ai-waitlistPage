@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { put, head } from "@vercel/blob";
 
 export async function POST(request: Request) {
   const { name, email, userType } = await request.json();
@@ -7,6 +8,51 @@ export async function POST(request: Request) {
     return new NextResponse(
       JSON.stringify({ message: "Missing required fields" }),
       { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const blobPath = "waitlist.json";
+  let waitlist = [];
+
+  try {
+    // Check if the blob exists and get its content
+    const blobInfo = await head(blobPath);
+    const blobContent = await fetch(blobInfo.url);
+    waitlist = await blobContent.json();
+  } catch (error: any) {
+    // A 404 error means the blob doesn't exist yet, which is fine.
+    // We'll proceed with an empty array.
+    if (error.status !== 404) {
+      console.error("Error fetching existing blob:", error);
+      // If it's another error, we might want to stop.
+      return new NextResponse(
+        JSON.stringify({ message: "Could not access waitlist storage." }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+  }
+
+  // Add the new user to the list
+  waitlist.push({
+    name,
+    email,
+    userType,
+    joinedAt: new Date().toISOString(),
+  });
+
+  try {
+    // Upload the updated waitlist back to Vercel Blob
+    const blob = await put(blobPath, JSON.stringify(waitlist, null, 2), {
+      access: "public",
+      contentType: "application/json",
+      allowOverwrite: true,
+    });
+    console.log("Blob updated at:", blob.url);
+  } catch (error) {
+    console.error("Error uploading to Vercel Blob:", error);
+    return new NextResponse(
+      JSON.stringify({ message: "Could not update waitlist." }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 
