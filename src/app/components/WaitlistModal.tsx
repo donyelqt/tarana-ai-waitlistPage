@@ -17,7 +17,7 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/waitlist", {
+      const response = await fetch("/api/getwaitlist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
