@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
   try {
     const response = await fetch(
-      `https://api.getwaitlist.com/api/v1/waitlists/${waitlistId}/signup`,
+      `https://api.getwaitlist.com/api/v1/signup`,
       {
         method: "POST",
         headers: {
@@ -31,13 +31,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           email,
           name,
-          answers: [
-            {
-              question_value: "Are you a:",
-              optional: false,
-              answer_value: userType,
-            },
-          ],
+          waitlist_id: parseInt(waitlistId, 10),
         }),
       }
     );
