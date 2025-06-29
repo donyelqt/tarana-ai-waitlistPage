@@ -19,10 +19,15 @@ export async function POST(request: Request) {
     const blobInfo = await head(blobPath);
     const blobContent = await fetch(blobInfo.url);
     waitlist = await blobContent.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     // A 404 error means the blob doesn't exist yet, which is fine.
     // We'll proceed with an empty array.
-    if (error.status !== 404) {
+    const status =
+      error && typeof error === "object" && "status" in error
+        ? (error as { status: unknown }).status
+        : undefined;
+
+    if (status !== 404) {
       console.error("Error fetching existing blob:", error);
       // If it's another error, we might want to stop.
       return new NextResponse(
