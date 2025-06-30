@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function convertToCsv(data: Record<string, any>[]) {
+export function convertToCsv(data: Record<string, string | number | boolean | null>[]) {
   if (!data || data.length === 0) {
     return "";
   }
