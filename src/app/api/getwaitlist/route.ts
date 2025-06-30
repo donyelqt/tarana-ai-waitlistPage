@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { put, head } from "@vercel/blob";
+import { convertToCsv } from "@/lib/utils";
 
 export async function POST(request: Request) {
   const { name, email, userType } = await request.json();
@@ -53,6 +54,15 @@ export async function POST(request: Request) {
       allowOverwrite: true,
     });
     console.log("Blob updated at:", blob.url);
+
+    // Also upload as CSV
+    const csvData = convertToCsv(waitlist);
+    const csvBlob = await put("waitlist.csv", csvData, {
+      access: "public",
+      contentType: "text/csv",
+      allowOverwrite: true,
+    });
+    console.log("CSV Blob updated at:", csvBlob.url);
   } catch (error) {
     console.error("Error uploading to Vercel Blob:", error);
     return new NextResponse(
